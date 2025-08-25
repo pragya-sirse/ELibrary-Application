@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Library Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-book"></i>
+            <span>E-Library</span>
+        </div>
+        <div class="nav-menu">
+            <div class="search-container">
+                <input type="text" id="globalSearch" placeholder="Search documents...">
+                <i class="fas fa-search"></i>
+            </div>
+            <!-- Theme Toggle Button -->
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+                <i class="fas fa-sun"></i>
+                <i class="fas fa-moon"></i>
+                <span>Theme</span>
+            </button>
+            
+            <div class="nav-user" id="userButton" onclick="showUserInfo()">
+                <i class="fas fa-user-circle"></i>
+                <span id="currentUserName">Visitor</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            
+            <!-- User Info Dropdown -->
+            <div class="user-dropdown" id="userDropdown" style="display: none;">
+                <div class="user-info">
+                    <div class="user-details">
+                        <strong id="userDisplayName">Anonymous Visitor</strong>
+                        <small id="userRole">Guest</small>
+                    </div>
+                    <div class="user-stats">
+                        <div class="stat-item">
+                            <span>Session Time:</span>
+                            <span id="sessionTime">0m</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Documents Viewed:</span>
+                            <span id="documentsViewed">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Downloads:</span>
+                            <span id="userDownloads">0</span>
+                        </div>
+                    </div>
+                    <div class="user-actions">
+                        <button class="btn btn-sm btn-secondary" onclick="changeUserName()">
+                            <i class="fas fa-edit"></i> Set Name
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="clearUserData()">
+                            <i class="fas fa-refresh"></i> Reset Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="menu-item" data-section="upload">
+                    <i class="fas fa-upload"></i>
+                    <span>Upload Document</span>
+                </div>
+                <div class="menu-item" data-section="documents">
+                    <i class="fas fa-file-alt"></i>
+                    <span>All Documents</span>
+                </div>
+                <div class="menu-item" data-section="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <!-- Footer content removed -->
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <p>Welcome to your E-Library Management System</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalDocuments">0</h3>
+                            <p>Total Documents</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalDownloads">0</h3>
+                            <p>Downloads</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Active Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalTags">0</h3>
+                            <p>Tags</p>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Document Upload Section -->
+            <section id="upload" class="content-section">
+                <div class="page-header">
+                    <h1>Upload Document</h1>
+                    <p>Add new documents to your library</p>
+                </div>
+
+                <div class="upload-container">
+                    <form id="documentUploadForm" class="upload-form">
+                        <div class="form-group">
+                            <label for="docTitle">Document Title</label>
+                            <input type="text" id="docTitle" name="title" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="docDescription">Description</label>
+                            <textarea id="docDescription" name="description" rows="4"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="docTags">Tags</label>
+                            <input type="text" id="docTags" name="tags" placeholder="Enter tags separated by commas (e.g., academic, research, pdf)">
+                            <small>Separate multiple tags with commas</small>
+                        </div>
+                        
+                        <div class="form-group file-upload-area">
+                            <label for="docFile">Choose File</label>
+                            <div class="file-drop-zone" id="fileDropZone">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Drag and drop your file here or click to browse</p>
+                                <p class="file-size-info"><strong>Maximum file size: 10MB</strong></p>
+                                <p class="supported-formats">Supported formats: PDF, DOC, DOCX, TXT, EPUB</p>
+                                <input type="file" id="docFile" name="file" accept=".pdf,.doc,.docx,.txt,.epub" hidden>
+                            </div>
+                            <div id="fileInfo" class="file-info hidden"></div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="reset" class="btn btn-secondary">Clear</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i>
+                                Upload Document
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </section>
+
+            <!-- Document List Section -->
+            <section id="documents" class="content-section">
+                <div class="page-header">
+                    <h1>All Documents</h1>
+                    <p>Browse and manage your document collection</p>
+                </div>
+
+                <div class="documents-controls">
+                    <div class="search-filters">
+                        <input type="text" id="documentSearch" placeholder="Search documents...">
+                        <select id="sortBy">
+                            <option value="date">Sort by Date</option>
+                            <option value="title">Sort by Title</option>
+                            <option value="author">Sort by Author</option>
+                            <option value="downloads">Sort by Downloads</option>
+                        </select>
+                    </div>
+                    <div class="view-controls">
+                        <button class="view-btn active" data-view="grid">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="documentsContainer" class="documents-grid">
+                    <!-- Document cards will be dynamically loaded here -->
+                </div>
+
+                <div class="pagination">
+                    <button class="btn btn-secondary" id="prevPage">Previous</button>
+                    <span id="pageInfo">Page 1 of 1</span>
+                    <button class="btn btn-secondary" id="nextPage">Next</button>
+                </div>
+
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="content-section">
+                <div class="page-header">
+                    <h1>Analytics</h1>
+                    <p>View library usage statistics</p>
+                </div>
+
+                <div class="analytics-container">
+                    <div class="chart-container">
+                        <h3>Daily Document Downloads</h3>
+                        <canvas id="downloadsChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

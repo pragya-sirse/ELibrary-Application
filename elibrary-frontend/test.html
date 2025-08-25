@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Library Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            margin: -2rem -2rem 2rem -2rem;
+            border-radius: 10px 10px 0 0;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        .section {
+            display: none;
+            padding: 20px 0;
+        }
+        .section.active {
+            display: block;
+        }
+        .menu {
+            margin: 20px 0;
+        }
+        .menu button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="navbar">
+            <h1>🔧 E-Library Test Page</h1>
+            <p>Testing basic functionality</p>
+        </div>
+
+        <div class="menu">
+            <button class="btn" onclick="showSection('dashboard')">Dashboard</button>
+            <button class="btn" onclick="showSection('upload')">Upload</button>
+            <button class="btn" onclick="showSection('documents')">Documents</button>
+            <button class="btn" onclick="testAPI()">Test API Connection</button>
+        </div>
+
+        <div id="dashboard" class="section active">
+            <h2>📊 Dashboard</h2>
+            <p>Welcome to the E-Library Management System</p>
+            <div id="stats">
+                <p>Total Documents: <span id="docCount">Loading...</span></p>
+                <p>Backend Status: <span id="backendStatus">Checking...</span></p>
+            </div>
+        </div>
+
+        <div id="upload" class="section">
+            <h2>📤 Upload Document</h2>
+            <form id="testUploadForm">
+                <p><input type="text" placeholder="Document Title" required></p>
+                <p><textarea placeholder="Description" rows="3"></textarea></p>
+                <p><input type="file" accept=".pdf,.doc,.docx"></p>
+                <p><button type="submit" class="btn">Upload Test</button></p>
+            </form>
+        </div>
+
+        <div id="documents" class="section">
+            <h2>📚 Documents</h2>
+            <div id="documentsList">
+                <p>Loading documents...</p>
+            </div>
+        </div>
+
+        <div id="apiTest" style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+            <h3>🔌 API Test Results</h3>
+            <div id="apiResults">Click "Test API Connection" to check backend connectivity</div>
+        </div>
+    </div>
+
+    <script>
+        // Test if JavaScript is working
+        console.log('JavaScript loaded successfully');
+        
+        // Simple section switching
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            console.log('Switched to section:', sectionName);
+        }
+
+        // Test API connection
+        async function testAPI() {
+            const resultsDiv = document.getElementById('apiResults');
+            resultsDiv.innerHTML = 'Testing API connection...';
+            
+            try {
+                // Test backend connection
+                const response = await fetch('http://localhost:8080/api/documents');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <p style="color: green;">✅ Backend Connected Successfully!</p>
+                        <p>Found ${data.length} documents in database</p>
+                        <p>Backend URL: http://localhost:8080/api</p>
+                    `;
+                    
+                    // Update document count
+                    document.getElementById('docCount').textContent = data.length;
+                    document.getElementById('backendStatus').innerHTML = '<span style="color: green;">✅ Online</span>';
+                    
+                    // Show some documents
+                    const docsList = document.getElementById('documentsList');
+                    if (data.length > 0) {
+                        docsList.innerHTML = data.map(doc => `
+                            <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                                <h4>${doc.title || 'Untitled'}</h4>
+                                <p>${doc.description || 'No description'}</p>
+                                <small>Uploaded: ${doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString() : 'Unknown'}</small>
+                            </div>
+                        `).join('');
+                    } else {
+                        docsList.innerHTML = '<p>No documents found. Try uploading one!</p>';
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <p style="color: red;">❌ Backend Connection Failed</p>
+                    <p>Error: ${error.message}</p>
+                    <p>Make sure your Spring Boot backend is running on port 8080</p>
+                    <p>Start it with: <code>mvn spring-boot:run</code></p>
+                `;
+                
+                document.getElementById('docCount').textContent = 'Error';
+                document.getElementById('backendStatus').innerHTML = '<span style="color: red;">❌ Offline</span>';
+                document.getElementById('documentsList').innerHTML = '<p style="color: red;">Cannot load documents - backend offline</p>';
+            }
+        }
+
+        // Test upload form
+        document.getElementById('testUploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Upload form is working! (This is just a test - actual upload needs backend)');
+        });
+
+        // Auto-test API on page load
+        window.addEventListener('load', function() {
+            console.log('Page loaded, testing API...');
+            setTimeout(testAPI, 1000); // Wait 1 second then test
+        });
+    </script>
+</body>
+</html>
